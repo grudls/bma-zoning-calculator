@@ -17,15 +17,19 @@ export const GatekeeperAlert: React.FC<GatekeeperAlertProps> = ({
 }) => {
   if (status === 'PASSED') {
     return (
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3 shadow-sm">
-        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+      <div className="apple-card p-5 border border-emerald-200/80 bg-gradient-to-b from-white to-emerald-50/30 flex items-start gap-3.5 transition-all">
+        <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+        </div>
         <div>
-          <h4 className="text-sm font-semibold text-emerald-900">
-            ผ่านเกณฑ์ความกว้างถนนขั้นต่ำตามกฎหมาย
+          <h4 className="text-xs font-semibold text-[#1D1D1F] tracking-tight">
+            ผ่านเกณฑ์ความกว้างเขตทางตามกฎหมาย
           </h4>
-          <p className="text-xs text-emerald-700 mt-0.5">
-            ความกว้างเขตทางถนนสาธารณะ ({roadWidth.toFixed(1)} เมตร) ผ่านเกณฑ์ข้อกำหนดขั้นต่ำสำหรับประเภท{' '}
-            <span className="font-semibold underline decoration-emerald-400">{typologyName}</span>
+          <p className="text-xs text-[#48484A] mt-0.5 leading-relaxed">
+            ความกว้างถนนสาธารณะ ({roadWidth.toFixed(1)} เมตร) ผ่านเกณฑ์ขั้นต่ำตามข้อกำหนดสำหรับ{' '}
+            <span className="font-semibold text-[#1D1D1F] underline decoration-emerald-300 underline-offset-2">
+              {typologyName}
+            </span>
           </p>
         </div>
       </div>
@@ -36,22 +40,30 @@ export const GatekeeperAlert: React.FC<GatekeeperAlertProps> = ({
 
   return (
     <div
-      className={`border rounded-xl p-4 shadow-sm transition-all ${
-        isError ? 'bg-rose-50 border-rose-300' : 'bg-amber-50 border-amber-300'
+      className={`apple-card p-5 transition-all border ${
+        isError
+          ? 'border-rose-200 bg-gradient-to-b from-white to-rose-50/40 ring-1 ring-rose-300/40'
+          : 'border-amber-200 bg-gradient-to-b from-white to-amber-50/40 ring-1 ring-amber-300/40'
       }`}
     >
-      <div className="flex items-start gap-3">
-        {isError ? (
-          <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-        ) : (
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-        )}
+      <div className="flex items-start gap-3.5">
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 shadow-2xs ${
+            isError ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'
+          }`}
+        >
+          {isError ? (
+            <XCircle className="w-4 h-4 text-rose-600" />
+          ) : (
+            <AlertTriangle className="w-4 h-4 text-amber-600" />
+          )}
+        </div>
 
-        <div className="flex-1 space-y-2">
+        <div className="flex-1 space-y-2.5">
           <div className="flex items-center justify-between">
             <h4
-              className={`text-sm font-bold ${
-                isError ? 'text-rose-900' : 'text-amber-900'
+              className={`text-xs font-semibold tracking-tight ${
+                isError ? 'text-rose-950' : 'text-amber-950'
               }`}
             >
               {isError
@@ -59,29 +71,29 @@ export const GatekeeperAlert: React.FC<GatekeeperAlertProps> = ({
                 : 'ข้อจำกัดทางกฎหมายเนื่องจากความกว้างถนน (Legal Restriction Warning)'}
             </h4>
             <span
-              className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+              className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
                 isError
-                  ? 'bg-rose-200 text-rose-800'
-                  : 'bg-amber-200 text-amber-800'
+                  ? 'bg-rose-200/70 text-rose-900 border border-rose-300'
+                  : 'bg-amber-200/70 text-amber-900 border border-amber-300'
               }`}
             >
-              ถนน {roadWidth.toFixed(1)} ม.
+              ถนน {roadWidth.toFixed(1)}ม.
             </span>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {violations.map((violation, index) => (
               <div
                 key={index}
-                className={`text-xs p-2.5 rounded-lg border ${
+                className={`text-xs p-3 rounded-xl border leading-relaxed ${
                   violation.severity === 'ERROR'
-                    ? 'bg-rose-100/60 border-rose-200 text-rose-900'
-                    : 'bg-amber-100/60 border-amber-200 text-amber-900'
+                    ? 'bg-rose-50/80 border-rose-200/70 text-rose-950'
+                    : 'bg-amber-50/80 border-amber-200/70 text-amber-950'
                 }`}
               >
-                <div className="font-semibold">{violation.title}</div>
-                <p className="mt-0.5 leading-relaxed">{violation.message}</p>
-                <div className="mt-1 text-[11px] font-mono opacity-80">
+                <div className="font-semibold text-[11px] mb-0.5">{violation.title}</div>
+                <p className="text-[11px] opacity-90">{violation.message}</p>
+                <div className="mt-1 text-[10px] font-mono text-[#86868B]">
                   อ้างอิง: {violation.legal_ref_id}
                 </div>
               </div>
