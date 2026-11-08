@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "typologies": {
+    "SINGLE_FAMILY_HOUSE": {
+      "id": "SINGLE_FAMILY_HOUSE",
+      "name_th": "บ้านพักอาศัยเดี่ยว",
+      "category": "residential",
+      "min_road_width_m": 0.0,
+      "default_floor_height_m": 3.2,
+      "setbacks": {
+        "boundary_side_back_m": 2.0,
+        "min_open_space_ratio_bcr": 30.0
+      },
+      "gatekeeper_rules": [],
+      "legal_ref": "MR_55_CLAUSE_34"
+    },
+    "LOW_RISE_CONDO": {
+      "id": "LOW_RISE_CONDO",
+      "name_th": "อาคารพักอาศัยรวม / คอนโดมิเนียม Low-Rise (สูงไม่เกิน 23 ม. / พื้นที่ < 10,000 ตร.ม.)",
+      "category": "residential_multi",
+      "min_road_width_m": 6.0,
+      "max_floor_area_sqm_if_road_under_6m": 2000.0,
+      "default_floor_height_m": 3.0,
+      "setbacks": {
+        "boundary_side_back_m": 3.0,
+        "min_open_space_ratio_bcr": 30.0
+      },
+      "gatekeeper_rules": [
+        {
+          "id": "RULE_CONDO_ROAD_LT_6M",
+          "condition": "road_width < 6.0",
+          "severity": "WARNING",
+          "title": "ข้อจำกัดขนาดอาคารในซอยแคบ",
+          "message": "หากความกว้างเขตทางสาธารณะน้อยกว่า 6.00 เมตร อาคารพักอาศัยรวมจะมีพื้นที่อาคารรวมได้ไม่เกิน 2,000 ตร.ม. และอาจถูกจำกัดประเภทตามข้อกำหนดผังเมืองรวม",
+          "legal_ref": "BMA_COMP_PLAN_2556_ITEM_RESIDENTIAL"
+        }
+      ],
+      "legal_ref": "BMA_BYLAW_2544_CLAUSE_54"
+    },
+    "HIGH_RISE_EXTRA_LARGE": {
+      "id": "HIGH_RISE_EXTRA_LARGE",
+      "name_th": "อาคารสูง (ความสูง ≥ 23 ม.) หรือ อาคารขนาดใหญ่พิเศษ (พื้นที่รวม > 10,000 ตร.ม.)",
+      "category": "high_rise_extra_large",
+      "min_road_width_m": 10.0,
+      "min_frontage_m": 12.0,
+      "default_floor_height_m": 3.2,
+      "setbacks": {
+        "boundary_side_back_m": 6.0,
+        "surrounding_open_space_m": 6.0,
+        "min_open_space_ratio_bcr": 20.0
+      },
+      "gatekeeper_rules": [
+        {
+          "id": "RULE_HIGHRISE_ROAD_LT_10M",
+          "condition": "road_width < 10.0",
+          "severity": "ERROR",
+          "title": "ไม่สามารถก่อสร้างอาคารสูงหรืออาคารขนาดใหญ่พิเศษได้",
+          "message": "ที่ดินต้องอยู่ติดถนนสาธารณะที่มีเขตทางกว้างไม่น้อยกว่า 10.00 เมตร และยาวต่อเนื่องไปสู่ถนนสาธารณะที่กว้างกว่า จึงจะสามารถขออนุญาตก่อสร้างอาคารสูงหรือขนาดใหญ่พิเศษได้",
+          "legal_ref": "MR_33_CLAUSE_2"
+        },
+        {
+          "id": "RULE_HIGHRISE_ROAD_LT_12M_LARGE",
+          "condition": "total_floor_area > 30000.0 && road_width < 12.0",
+          "severity": "ERROR",
+          "title": "ถนนกว้างไม่พอสำหรับอาคารขนาดเกิน 30,000 ตร.ม.",
+          "message": "อาคารขนาดใหญ่พิเศษที่มีพื้นที่อาคารรวมเกิน 30,000 ตร.ม. ต้องอยู่ติดถนนสาธารณะกว้างไม่น้อยกว่า 12.00 หรือ 18.00 เมตร ตามกฎกระทรวงฉบับที่ 33",
+          "legal_ref": "MR_33_CLAUSE_2_AMENDED"
+        }
+      ],
+      "legal_ref": "MR_33_CLAUSE_2"
+    },
+    "OFFICE_BUILDING": {
+      "id": "OFFICE_BUILDING",
+      "name_th": "อาคารสำนักงานทั่วไป",
+      "category": "commercial_office",
+      "min_road_width_m": 6.0,
+      "default_floor_height_m": 3.8,
+      "setbacks": {
+        "boundary_side_back_m": 3.0,
+        "min_open_space_ratio_bcr": 10.0
+      },
+      "gatekeeper_rules": [
+        {
+          "id": "RULE_OFFICE_ROAD_LT_6M",
+          "condition": "road_width < 6.0",
+          "severity": "WARNING",
+          "title": "ข้อจำกัดอาคารพาณิชย์/สำนักงานในซอยแคบ",
+          "message": "ถนนสาธารณะกว้างน้อยกว่า 6.00 เมตร ไม่สามารถก่อสร้างอาคารพาณิชย์หรือสำนักงานขนาดใหญ่เกิน 2,000 ตร.ม. ได้",
+          "legal_ref": "MR_55_CLAUSE_42"
+        }
+      ],
+      "legal_ref": "MR_55_CLAUSE_42"
+    }
+  }
+}
