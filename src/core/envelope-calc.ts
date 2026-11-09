@@ -36,7 +36,6 @@ export function calculateEnvelopeConstraints(
 
   // 2. Maximum Building Height at Front Setback Line (ข้อ 44 ข้อบัญญัติ กทม. 2544)
   // ความสูงไม่เกิน 2 เท่าของระยะห่างในแนวนอนไปถึงแนวเขตทางฝั่งตรงข้าม
-  // Distance to opposite road boundary = roadWidth + roadSetbackFromBoundaryM
   const distanceToOppositeRoadBoundary = roadWidth + roadSetbackFromBoundaryM;
   const maxBuildingHeightAtFrontM = Math.round(2 * distanceToOppositeRoadBoundary * 100) / 100;
 
@@ -45,17 +44,20 @@ export function calculateEnvelopeConstraints(
   const estimatedMaxFloors = Math.floor(maxBuildingHeightAtFrontM / floorHeight);
 
   // Side and rear setbacks from property lines
-  const sideBackSetbackM = typology.setbacks.surrounding_open_space_m || typology.setbacks.boundary_side_back_m || 2.0;
+  const sideBackSetbackM =
+    typology.setbacks.surrounding_open_space_m || typology.setbacks.boundary_side_back_m || 2.0;
 
   // 3. Geometric Buildable Footprint Calculation (If Dimensions are provided)
+  let buildableWidthM: number | undefined = undefined;
+  let buildableDepthM: number | undefined = undefined;
   let realisticFootprintSqm: number | undefined = undefined;
   let isFootprintLimitedBySetback = false;
 
   if (dimensions && dimensions.width_frontage_m > 0 && dimensions.depth_m > 0) {
-    const buildableWidth = Math.max(0, dimensions.width_frontage_m - 2 * sideBackSetbackM);
-    const buildableDepth = Math.max(0, dimensions.depth_m - (roadSetbackFromBoundaryM + sideBackSetbackM));
+    buildableWidthM = Math.round(Math.max(0, dimensions.width_frontage_m - 2 * sideBackSetbackM) * 100) / 100;
+    buildableDepthM = Math.round(Math.max(0, dimensions.depth_m - (roadSetbackFromBoundaryM + sideBackSetbackM)) * 100) / 100;
 
-    realisticFootprintSqm = Math.round(buildableWidth * buildableDepth * 100) / 100;
+    realisticFootprintSqm = Math.round(buildableWidthM * buildableDepthM * 100) / 100;
 
     if (theoreticalFootprintSqm !== undefined && realisticFootprintSqm < theoreticalFootprintSqm) {
       isFootprintLimitedBySetback = true;
@@ -69,6 +71,8 @@ export function calculateEnvelopeConstraints(
     max_building_height_at_front_m: maxBuildingHeightAtFrontM,
     estimated_max_floors: estimatedMaxFloors,
     road_width_m: roadWidth,
+    buildable_width_m: buildableWidthM,
+    buildable_depth_m: buildableDepthM,
     realistic_footprint_sqm: realisticFootprintSqm,
     is_footprint_limited_by_setback: isFootprintLimitedBySetback,
     legal_ref_ids: ['BMA_BYLAW_2544_CLAUSE_54', 'BMA_BYLAW_2544_CLAUSE_44'],

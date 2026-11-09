@@ -54,6 +54,61 @@ export function sqmToRaiNganWah(sqm: number): ThaiLandArea {
 }
 
 /**
+ * Derives synchronized land dimensions (Width x Depth) from total square meters
+ * while preserving the user's current aspect ratio (defaulting to ~1 : 1.5625, e.g. 32m x 50m for 1,600 sq.m.)
+ */
+export function deriveDimensionsFromSqm(
+  sqm: number,
+  currentDimensions?: { width_frontage_m: number; depth_m: number }
+): { width_frontage_m: number; depth_m: number } {
+  const safeSqm = Math.max(0, Number(sqm) || 0);
+  if (safeSqm <= 0) {
+    return { width_frontage_m: 0, depth_m: 0 };
+  }
+
+  // If currentDimensions already match safeSqm closely, keep them intact
+  if (
+    currentDimensions &&
+    currentDimensions.width_frontage_m > 0 &&
+    currentDimensions.depth_m > 0 &&
+    Math.abs(currentDimensions.width_frontage_m * currentDimensions.depth_m - safeSqm) < 0.05
+  ) {
+    return {
+      width_frontage_m: currentDimensions.width_frontage_m,
+      depth_m: currentDimensions.depth_m,
+    };
+  }
+
+  // Default ratio 0.64 gives 32m x 50m = 1,600 sq.m. (1 Rai)
+  let ratio = 0.64;
+  if (
+    currentDimensions &&
+    currentDimensions.width_frontage_m > 0 &&
+    currentDimensions.depth_m > 0
+  ) {
+    const rawRatio = currentDimensions.width_frontage_m / currentDimensions.depth_m;
+    ratio = Math.max(0.2, Math.min(4.0, rawRatio));
+  }
+
+  const rawWidth = Math.sqrt(safeSqm * ratio);
+  const roundedIntWidth = Math.round(rawWidth);
+
+  let width: number;
+  if (roundedIntWidth > 0 && Math.abs((safeSqm / roundedIntWidth) - Math.round(safeSqm / roundedIntWidth)) < 1e-6) {
+    width = roundedIntWidth;
+  } else {
+    width = Math.max(1, Math.round(rawWidth * 10) / 10);
+  }
+
+  const depth = Math.round((safeSqm / width) * 100) / 100;
+
+  return {
+    width_frontage_m: width,
+    depth_m: depth,
+  };
+}
+
+/**
  * Converts dimensions (Width x Depth) to total square meters and Thai land units
  */
 export function dimensionsToArea(widthM: number, depthM: number): ThaiLandArea {

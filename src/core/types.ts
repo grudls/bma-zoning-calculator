@@ -93,6 +93,8 @@ export interface EnvelopeResult {
   max_building_height_at_front_m: number;
   estimated_max_floors: number;
   road_width_m: number;
+  buildable_width_m?: number;
+  buildable_depth_m?: number;
   realistic_footprint_sqm?: number;
   is_footprint_limited_by_setback?: boolean;
   legal_ref_ids: string[];
@@ -105,9 +107,12 @@ export interface CalculationResult {
     rai: number;
     ngan: number;
     sqwah: number;
+    width_frontage_m: number;
+    depth_m: number;
     road_width_m: number;
     zone_code: string;
     zone_name: string;
+    typology_id: string;
     typology_name: string;
   };
   gatekeeper: {

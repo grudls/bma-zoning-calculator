@@ -5,7 +5,11 @@ import {
   TypologyConfig,
   LegalCitation,
 } from './types';
-import { raiNganWahToSqm, sqmToRaiNganWah } from './unit-converter';
+import {
+  raiNganWahToSqm,
+  sqmToRaiNganWah,
+  deriveDimensionsFromSqm,
+} from './unit-converter';
 import { evaluateRoadGatekeeper } from './gatekeeper';
 import { calculateTheoreticalLimits } from './theoretical-calc';
 import { calculateEnvelopeConstraints } from './envelope-calc';
@@ -32,7 +36,7 @@ export function getCitation(id: string): LegalCitation | undefined {
 
 /**
  * Main Calculation Pipeline:
- * 1. Normalize land area
+ * 1. Normalize land area & synchronize dimensions (Two-way consistency)
  * 2. Lookup zone and typology configs
  * 3. Evaluate road width gatekeeper
  * 4. Calculate Tier 1 theoretical maximums
@@ -40,8 +44,10 @@ export function getCitation(id: string): LegalCitation | undefined {
  * 6. Collect all legal citations
  */
 export function calculateBuildingFeasibility(input: UserInput): CalculationResult {
-  // 1. Normalize Land Area
+  // 1. Normalize Land Area & Synchronize Dimensions
   let landAreaSqm = 0;
+  let effectiveDimensions = { width_frontage_m: 0, depth_m: 0 };
+
   if (input.input_mode === 'TOTAL_AREA' && input.total_area) {
     landAreaSqm = raiNganWahToSqm(
       input.total_area.rai,
@@ -49,8 +55,12 @@ export function calculateBuildingFeasibility(input: UserInput): CalculationResul
       input.total_area.sqwah,
       input.total_area.sqm_override
     );
+    effectiveDimensions = deriveDimensionsFromSqm(landAreaSqm, input.dimensions);
   } else if (input.input_mode === 'DIMENSIONS' && input.dimensions) {
-    landAreaSqm = (input.dimensions.width_frontage_m || 0) * (input.dimensions.depth_m || 0);
+    const w = Math.max(0, Number(input.dimensions.width_frontage_m) || 0);
+    const d = Math.max(0, Number(input.dimensions.depth_m) || 0);
+    landAreaSqm = Math.round(w * d * 100) / 100;
+    effectiveDimensions = { width_frontage_m: w, depth_m: d };
   }
 
   const thaiUnits = sqmToRaiNganWah(landAreaSqm);
@@ -72,11 +82,11 @@ export function calculateBuildingFeasibility(input: UserInput): CalculationResul
     theoretical.max_gross_floor_area_sqm
   );
 
-  // 5. Tier 2: Envelope & Height Calculation
+  // 5. Tier 2: Envelope & Height Calculation (using synchronized effectiveDimensions)
   const envelope = calculateEnvelopeConstraints(
     input.road_width_m,
     typology,
-    input.input_mode === 'DIMENSIONS' ? input.dimensions : undefined,
+    effectiveDimensions,
     theoretical.max_footprint_sqm
   );
 
@@ -100,9 +110,12 @@ export function calculateBuildingFeasibility(input: UserInput): CalculationResul
       rai: thaiUnits.rai,
       ngan: thaiUnits.ngan,
       sqwah: thaiUnits.sqwah,
+      width_frontage_m: effectiveDimensions.width_frontage_m,
+      depth_m: effectiveDimensions.depth_m,
       road_width_m: input.road_width_m,
       zone_code: zone.code,
       zone_name: zone.name_th,
+      typology_id: typology.id,
       typology_name: typology.name_th,
     },
     gatekeeper,

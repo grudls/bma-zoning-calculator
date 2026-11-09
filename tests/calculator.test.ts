@@ -5,6 +5,7 @@ import {
   raiNganWahToSqm,
   sqmToRaiNganWah,
   formatThaiArea,
+  deriveDimensionsFromSqm,
 } from '../src/core/unit-converter';
 import { calculateTheoreticalLimits } from '../src/core/theoretical-calc';
 import { evaluateRoadGatekeeper } from '../src/core/gatekeeper';
@@ -175,5 +176,26 @@ describe('Full Pipeline Integration Tests', () => {
     assert.equal(result.theoretical.max_gross_floor_area_sqm, 32000);
     assert.equal(result.gatekeeper.status, 'PASSED');
     assert.ok(result.citations.length >= 3);
+  });
+
+  it('should synchronize dimensions with total_area (1 Rai = 1,600 sqm) in TOTAL_AREA mode', () => {
+    const derived = deriveDimensionsFromSqm(1600);
+    assert.equal(Math.round(derived.width_frontage_m * derived.depth_m), 1600);
+
+    const result = calculateBuildingFeasibility({
+      input_mode: 'TOTAL_AREA',
+      total_area: { rai: 1, ngan: 0, sqwah: 0 }, // 1,600 sqm
+      dimensions: { width_frontage_m: 20, depth_m: 40 }, // stale 800 sqm should be synced
+      road_width_m: 6.0,
+      selected_zone_key: 'Y4',
+      selected_typology_id: 'LOW_RISE_CONDO',
+    });
+
+    assert.equal(result.input_summary.land_area_sqm, 1600);
+    assert.equal(result.theoretical.max_gross_floor_area_sqm, 4800);
+    assert.equal(
+      Math.round(result.input_summary.width_frontage_m * result.input_summary.depth_m),
+      1600
+    );
   });
 });

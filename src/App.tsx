@@ -22,8 +22,8 @@ const INITIAL_INPUT: UserInput = {
     sqwah: 0,
   },
   dimensions: {
-    width_frontage_m: 20,
-    depth_m: 40,
+    width_frontage_m: 32,
+    depth_m: 50,
   },
   road_width_m: 6.0,
   selected_zone_key: 'Y4',
@@ -51,6 +51,7 @@ export const App: React.FC = () => {
       data: {
         input_mode: 'TOTAL_AREA' as const,
         total_area: { rai: 1, ngan: 0, sqwah: 0 },
+        dimensions: { width_frontage_m: 32, depth_m: 50 },
         road_width_m: 6.0,
         selected_zone_key: 'Y4',
         selected_typology_id: 'LOW_RISE_CONDO',
@@ -63,6 +64,7 @@ export const App: React.FC = () => {
       data: {
         input_mode: 'TOTAL_AREA' as const,
         total_area: { rai: 2, ngan: 2, sqwah: 0 },
+        dimensions: { width_frontage_m: 50, depth_m: 80 },
         road_width_m: 18.0,
         selected_zone_key: 'P5',
         selected_typology_id: 'HIGH_RISE_EXTRA_LARGE',
@@ -75,6 +77,7 @@ export const App: React.FC = () => {
       data: {
         input_mode: 'TOTAL_AREA' as const,
         total_area: { rai: 1, ngan: 0, sqwah: 0 },
+        dimensions: { width_frontage_m: 32, depth_m: 50 },
         road_width_m: 5.0,
         selected_zone_key: 'Y9',
         selected_typology_id: 'HIGH_RISE_EXTRA_LARGE',
@@ -86,6 +89,7 @@ export const App: React.FC = () => {
       badge: 'ทดสอบ Envelope',
       data: {
         input_mode: 'DIMENSIONS' as const,
+        total_area: { rai: 0, ngan: 1, sqwah: 5 },
         dimensions: { width_frontage_m: 12, depth_m: 35 },
         road_width_m: 6.0,
         selected_zone_key: 'Y4',
